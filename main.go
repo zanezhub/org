@@ -1,14 +1,3 @@
-/*
-	Parse args
-		* From
-		* To
-	Revisar si existen las carpetas
-
-
-	* Revisar qué mes tiene
-
-*/
-
 package main
 
 import (
@@ -20,7 +9,7 @@ import (
 	"slices"
 )
 
-func makedirs(arp *[]fs.DirEntry, to *string) {
+func makedirs(arp *[]fs.DirEntry, to *string, from *string) {
 	pattern := "2023(\\w\\w)"
 	re := regexp.MustCompile(pattern)
 
@@ -37,8 +26,23 @@ func makedirs(arp *[]fs.DirEntry, to *string) {
 
 	}
 
+	os.Chdir(*to)
 	for _, m := range months {
-		os.Mkdir(m, os.ModeDir)
+		os.Mkdir(m, os.ModeDir) // TODO: Revisar si existen las carpetas y saltar esto
+	}
+
+	for _, e := range *arp {
+		match := re.FindStringSubmatch(e.Name())
+
+		if len(match) >= 2 {
+			value := match[1]
+
+			old := *from + "\\" + e.Name()
+			new := *to + "\\" + value + "\\" + e.Name()
+
+			os.Rename(old, new) // TODO: handle error
+		}
+
 	}
 
 }
@@ -47,6 +51,8 @@ func main() {
 	frm := flag.String("frm", "folder to read", "string")
 	to := flag.String("to", "folder to move", "string")
 	flag.Parse()
+
+	// TODO: Revisar los args por "\" al final de la cadena y quitarlos
 
 	// Revisar si existe el folder
 	err := os.Chdir(*frm)
@@ -61,7 +67,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	arp := &entries
-	makedirs(arp, to)
+	makedirs(&entries, to, frm)
 
 }
