@@ -1,3 +1,4 @@
+// [-] TODO: Compatibilidad con Linux en "\" "/" (Carpetas)
 package main
 
 import (
@@ -28,7 +29,11 @@ func makedirs(arp *[]fs.DirEntry, to *string, from *string) {
 
 	os.Chdir(*to)
 	for _, m := range months {
-		os.Mkdir(m, os.ModeDir) // TODO: Revisar si existen las carpetas y saltar esto
+		err := os.Mkdir(m, os.ModeDir) // [X] TODO: Revisar si ya se crearon las carpetas y saltar esto
+		if err != nil && !os.IsExist(err) {
+			fmt.Println(err)
+			return
+		}
 	}
 
 	for _, e := range *arp {
@@ -40,9 +45,25 @@ func makedirs(arp *[]fs.DirEntry, to *string, from *string) {
 			old := *from + "\\" + e.Name()
 			new := *to + "\\" + value + "\\" + e.Name()
 
-			os.Rename(old, new) // TODO: handle error
+			os.Rename(old, new) // [?] TODO: handle error. Tal vez no aplica
 		}
 
+	}
+
+}
+
+// [?] TODO: Reescribir
+func check(frm *string, to *string) {
+	{
+		char := (*frm)[len(*frm)-1:]
+		if char == "\\" || char == "/" {
+			*frm = (*frm)[:len(*frm)-1]
+		}
+	}
+
+	char := (*to)[len(*to)-1:]
+	if char == "\\" || char == "/" {
+		*to = (*to)[:len(*to)-1]
 	}
 
 }
@@ -52,14 +73,15 @@ func main() {
 	to := flag.String("to", "folder to move", "string")
 	flag.Parse()
 
-	// TODO: Revisar los args por "\" al final de la cadena y quitarlos
-
 	// Revisar si existe el folder
 	err := os.Chdir(*frm)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	// [X] TODO: Revisar los args por "\" al final de la cadena y quitarlos
+	check(frm, to)
 
 	// Leer contenidos
 	entries, err := os.ReadDir(*frm)
