@@ -5,10 +5,19 @@ import (
 	"io/fs"
 	"os"
 	"regexp"
-	"slices"
+	"strings"
 )
 
-func grepMonths(files *[]fs.DirEntry, to *string, from *string) ([]string, *regexp.Regexp) {
+func is_in_array(arr *[]string, str *string) bool {
+	for _, value := range *arr {
+		if *str == value {
+			return true
+		}
+	}
+	return false
+}
+
+func get_months(files *[]fs.DirEntry, to *string, from *string) ([]string, *regexp.Regexp) {
 	pattern := "2023(\\w\\w)"
 	re := regexp.MustCompile(pattern)
 
@@ -18,7 +27,7 @@ func grepMonths(files *[]fs.DirEntry, to *string, from *string) ([]string, *rege
 
 		if len(match) >= 2 {
 			value := match[1] // The value "xx" is in the first capturing group
-			if !slices.Contains(months, value) {
+			if !is_in_array(&months, &value) {
 				months = append(months, value)
 			}
 		}
@@ -28,7 +37,7 @@ func grepMonths(files *[]fs.DirEntry, to *string, from *string) ([]string, *rege
 	return months, re
 }
 
-func makeDir(to *string, months *[]string) {
+func make_dir(to *string, months *[]string) {
 	err := os.Chdir(*to)
 	if err != nil {
 		fmt.Printf("Can't find or change folder ro %s\n %e", *to, err)
@@ -48,6 +57,7 @@ func move(files *[]fs.DirEntry, to *string, from *string, re *regexp.Regexp) {
 	for _, e := range *files {
 		match := (*re).FindStringSubmatch(e.Name())
 
+		// [?] TODO: Reescribir
 		if len(match) >= 2 {
 			value := match[1]
 			old := *from + "\\" + e.Name()
@@ -61,19 +71,13 @@ func move(files *[]fs.DirEntry, to *string, from *string, re *regexp.Regexp) {
 
 }
 
-// [?] TODO: Reescribir
-// [X] TODO: Revisar los args por "\" al final de la cadena y quitarlos
-func check(frm *string, to *string) {
-	{
-		char := (*frm)[len(*frm)-1:]
-		if char == "\\" || char == "/" {
-			*frm = (*frm)[:len(*frm)-1]
-		}
-	}
+/*
+[X] TODO: Reescribir
+[X] TODO: Revisar los args por "\" al final de la cadena y quitarlos
+*/
 
-	char := (*to)[len(*to)-1:]
-	if char == "\\" || char == "/" {
-		*to = (*to)[:len(*to)-1]
+func check(str *string) {
+	if strings.HasSuffix(*str, "\\") || strings.HasSuffix(*str, "/") {
+		*str = (*str)[:len(*str)-1]
 	}
-
 }

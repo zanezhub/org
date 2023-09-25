@@ -8,17 +8,26 @@ import (
 )
 
 func main() {
-	frm := flag.String("frm", "", "string")
-	to := flag.String("to", "", "string")
+	frm := flag.String("frm", "", "Folder that you want to read")
+	to := flag.String("to", "", "Folder that you want to move to")
 	flag.Parse()
 
+	// [-] Reescribir
+	if *frm == "" || *to == "" {
+		fmt.Println("One of the args is nil")
+		return
+	}
+
 	// Revisar si existe el folder
+	// [?] Reescribir
 	err := os.Chdir(*frm)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
-	check(frm, to)
+	check(frm)
+	check(to)
 
 	// Leer contenidos
 	entries, err := os.ReadDir(*frm)
@@ -26,7 +35,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	months, re := grepMonths(&entries, to, frm)
-	makeDir(to, &months)
+	months, re := get_months(&entries, to, frm)
+	make_dir(to, &months)
 	move(&entries, to, frm, re)
 }
