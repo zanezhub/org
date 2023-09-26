@@ -17,6 +17,18 @@ func is_in_array(arr *[]string, str *string) bool {
 	return false
 }
 
+func dir_exists(path *string) bool {
+	//Return err?
+	_, err := os.Stat(*path)
+
+	if err != nil && os.IsNotExist(err) {
+		fmt.Printf("Folder %s does not exist", *path)
+		return false
+	}
+
+	return true
+}
+
 func get_months(files *[]fs.DirEntry, to *string, from *string) ([]string, *regexp.Regexp) {
 	pattern := "2023(\\w\\w)"
 	re := regexp.MustCompile(pattern)
@@ -37,47 +49,46 @@ func get_months(files *[]fs.DirEntry, to *string, from *string) ([]string, *rege
 	return months, re
 }
 
-func make_dir(to *string, months *[]string) {
+func make_dir(to *string, months *[]string) error {
 	err := os.Chdir(*to)
 	if err != nil {
-		fmt.Printf("Can't find or change folder ro %s\n %e", *to, err)
+		return err
 	}
 
 	for _, m := range *months {
-		// [X] TODO: Revisar si ya se crearon las carpetas y saltar esto
 		err := os.Mkdir(m, os.ModeDir)
 		if err != nil && !os.IsExist(err) {
-			fmt.Println(err)
+			return err
 		}
 	}
 
+	return nil
 }
 
-func move(files *[]fs.DirEntry, to *string, from *string, re *regexp.Regexp) {
-	for _, e := range *files {
-		match := (*re).FindStringSubmatch(e.Name())
+func move(files *[]fs.DirEntry, to *string, from *string, re *regexp.Regexp) error {
+	for _, dir := range *files {
+		match := (*re).FindStringSubmatch(dir.Name())
 
 		// [?] TODO: Reescribir
 		if len(match) >= 2 {
 			value := match[1]
-			old := *from + "\\" + e.Name()
-			new := *to + "\\" + value + "\\" + e.Name()
+			old := *from + "\\" + dir.Name()
+			new := *to + "\\" + value + "\\" + dir.Name()
 
-			// [?] TODO: handle error. Tal vez no aplica
-			os.Rename(old, new)
+			err := os.Rename(old, new)
+			if err != nil {
+				return err
+			}
 		}
 
 	}
 
+	return nil
 }
 
-/*
-[X] TODO: Reescribir
-[X] TODO: Revisar los args por "\" al final de la cadena y quitarlos
-*/
-
-func check(str *string) {
+func clean_input(str *string) {
 	if strings.HasSuffix(*str, "\\") || strings.HasSuffix(*str, "/") {
+		// Eliminar último char
 		*str = (*str)[:len(*str)-1]
 	}
 
@@ -87,4 +98,5 @@ func check(str *string) {
 
 		*str = current + *str
 	}
+
 }

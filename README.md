@@ -8,10 +8,10 @@ go build
 
 ## TODO
 - [X] Separar el código
-- [x] Reescribir `func check(frm * string, to *string)`
+- [X] Reescribir `func check(frm * string, to *string)`
 - [ ] Compatibilidad con Linux (estructura de carpetas)
 - [ ] Tomar regex como un input
-- [x] Directorios en el mismo directorio
+- [X] Directorios en el mismo directorio
 ```
 (.) You are here
 test <|
@@ -21,7 +21,6 @@ test <|
 ```
 ```
 ./org -frm .\test\from -to .\test\des
-
 ```
 
 ## Features

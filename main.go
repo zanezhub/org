@@ -1,4 +1,3 @@
-// [-] TODO: Compatibilidad con Linux en "\" "/" (Cfilesetas)
 package main
 
 import (
@@ -9,33 +8,33 @@ import (
 
 func main() {
 	frm := flag.String("frm", "", "Folder that you want to read")
-	to := flag.String("to", "", "Folder that you want to move to")
+	to := flag.String("to", "", "Folder that you want to move the files to")
 	flag.Parse()
 
-	// [-] Reescribir
-	if *frm == "" || *to == "" {
-		fmt.Println("One of the args is nil")
+	clean_input(frm)
+	clean_input(to)
+
+	if dir_exists(frm) && dir_exists(to) {
+		entries, err := os.ReadDir(*frm)
+		if err != nil {
+			fmt.Println("Couldn't get all the entries")
+			fmt.Printf("The program will continue with the following number entries: %d\n", len(entries))
+		}
+
+		months, re := get_months(&entries, to, frm)
+		err = make_dir(to, &months)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		err = move(&entries, to, frm, re)
+		if err != nil {
+			fmt.Println("Couldn't move/rename, the error is a type *LinkError")
+			fmt.Println(err)
+			return
+		}
+	} else {
 		return
 	}
 
-	check(frm)
-	check(to)
-
-	// Revisar si existe el folder
-	// [?] Reescribir
-	err := os.Chdir(*frm)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Leer contenidos
-	entries, err := os.ReadDir(*frm)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	months, re := get_months(&entries, to, frm)
-	make_dir(to, &months)
-	move(&entries, to, frm, re)
 }
