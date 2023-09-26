@@ -18,6 +18,9 @@ func main() {
 		return
 	}
 
+	check(frm)
+	check(to)
+
 	// Revisar si existe el folder
 	// [?] Reescribir
 	err := os.Chdir(*frm)
@@ -25,9 +28,6 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-
-	check(frm)
-	check(to)
 
 	// Leer contenidos
 	entries, err := os.ReadDir(*frm)

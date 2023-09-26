@@ -11,7 +11,18 @@ go build
 - [x] Reescribir `func check(frm * string, to *string)`
 - [ ] Compatibilidad con Linux (estructura de carpetas)
 - [ ] Tomar regex como un input
-- [ ] . Folders
+- [x] Directorios en el mismo directorio
+```
+(.) You are here
+test <|
+      |->des
+      |->from
+           |-> Files you want to move 
+```
+```
+./org -frm .\test\from -to .\test\des
+
+```
 
 ## Features
 - [ ] Buscar dentro de otras carpetas

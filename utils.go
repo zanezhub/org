@@ -80,4 +80,11 @@ func check(str *string) {
 	if strings.HasSuffix(*str, "\\") || strings.HasSuffix(*str, "/") {
 		*str = (*str)[:len(*str)-1]
 	}
+
+	if strings.HasPrefix(*str, ".\\") {
+		*str = strings.TrimPrefix(*str, ".")
+		current, _ := os.Getwd()
+
+		*str = current + *str
+	}
 }
