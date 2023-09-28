@@ -18,8 +18,7 @@ func is_in_array(arr *[]string, str *string) bool {
 }
 
 func dir_exists(path *string) bool {
-	//Return err?
-	_, err := os.Stat(*path)
+	_, err := os.Stat(*path) //Return err?
 
 	if err != nil && os.IsNotExist(err) {
 		fmt.Printf("Folder %s does not exist", *path)
@@ -87,16 +86,22 @@ func move(files *[]fs.DirEntry, to *string, from *string, re *regexp.Regexp) err
 }
 
 func clean_input(str *string) {
-	if strings.HasSuffix(*str, "\\") || strings.HasSuffix(*str, "/") {
-		// Eliminar último char
-		*str = (*str)[:len(*str)-1]
-	}
 
-	if strings.HasPrefix(*str, ".\\") {
+	switch {
+	case strings.HasSuffix(*str, "\\") || strings.HasSuffix(*str, "/"):
+		*str = (*str)[:len(*str)-1]
+
+	case strings.HasPrefix(*str, ".\\"):
 		*str = strings.TrimPrefix(*str, ".")
 		current, _ := os.Getwd()
-
 		*str = current + *str
+
+	case *str == ".":
+		*str, _ = os.Getwd()
 	}
 
+	/*
+		TODO: ../dir/dir
+		Carpeta anterior de la actual
+	*/
 }

@@ -6,6 +6,11 @@ go build
 
 ```
 
+```
+Prueba con 100,000 imagenes vacías:
+Time: 1.5637199s
+```
+
 ## TODO
 - [X] Separar el código
 - [X] Reescribir `func check(frm * string, to *string)`
