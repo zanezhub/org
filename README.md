@@ -2,20 +2,14 @@
 ## Usar
 ```go
 go build
-./org.exe -frm <string> -to <string>
-
+./org.exe -frm <string> -to <string> -regex <string>
 ```
-
-```
-Prueba con 100,000 imagenes vacías:
-Time: 1.5637199s
-```
-
 ## TODO
+- [ ] Compatibilidad con Linux (estructura de carpetas)
+- [ ] Buscar dentro de otras carpetas
 - [X] Separar el código
 - [X] Reescribir `func check(frm * string, to *string)`
-- [ ] Compatibilidad con Linux (estructura de carpetas)
-- [ ] Tomar regex como un input
+- [X] Tomar regex como un input
 - [X] Directorios en el mismo directorio
 ```
 (.) You are here
@@ -27,6 +21,3 @@ test <|
 ```
 ./org -frm .\test\from -to .\test\des
 ```
-
-## Features
-- [ ] Buscar dentro de otras carpetas

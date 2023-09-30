@@ -17,30 +17,32 @@ type organizer struct {
 	*/
 
 	Files   []fs.DirEntry
-	Dirs    []fs.DirEntry
 	NewDirs []string
 
-	From      string
-	To        string
-	Recursive bool
+	From string
+	To   string
 
-	OldPath string
-	NewPath string
+	// No se usan
+	Dirs      []fs.DirEntry
+	OldPath   string
+	NewPath   string
+	Recursive bool
 
 	Regex string
 }
 
 func CleanInput(input *string) {
-	switch {
-	case strings.HasSuffix(*input, "\\") || strings.HasSuffix(*input, "/"):
-		*input = (*input)[:len(*input)-1]
-
-	case strings.HasPrefix(*input, ".\\"):
+	if strings.HasPrefix(*input, ".\\") {
 		*input = strings.TrimPrefix(*input, ".")
 		current, _ := os.Getwd()
 		*input = current + *input
+	}
 
-	case *input == ".":
+	if strings.HasSuffix(*input, "\\") || strings.HasSuffix(*input, "/") {
+		*input = (*input)[:len(*input)-1]
+	}
+
+	if *input == "." {
 		*input, _ = os.Getwd()
 	}
 }
@@ -56,7 +58,7 @@ func (o *organizer) DirExists() {
 func (o *organizer) GetEntries() {
 	entries, err := os.ReadDir(o.From)
 	if err != nil {
-		fmt.Println("ERROR: The program will continue with the value it could collect before the error.", err)
+		fmt.Println("The program will continue with the value it could collect before the error.", err)
 	}
 
 	for _, entry := range entries {
@@ -77,13 +79,13 @@ func (o *organizer) ParseFiles() {
 
 		if len(match) >= 2 {
 			value := match[1]
-			// TODO: Check if there's repeated values
+			// TODO: Check if there's repeated values in o.NewDirs
 			o.NewDirs = append(o.NewDirs, value)
 		}
 	}
 }
 
-func (o *organizer) MakeDir() {
+func (o *organizer) MakeDirs() {
 	err := os.Chdir(o.To)
 	if err != nil {
 		log.Fatal(err)
