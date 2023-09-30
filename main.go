@@ -1,17 +1,15 @@
 package main
 
-import (
-	"flag"
-)
-
 func main() {
-	frm := flag.String("frm", "", "Folder that you want to read")
-	to := flag.String("to", "", "Folder that you want to move the files to")
-	flag.Parse()
+	var org organizer
+	org.From = "D:\\Go\\org\\test\\from"
+	org.To = "D:\\Go\\org\\test\\des"
 
-	clean_input(frm)
-	clean_input(to)
+	org.Regex = "2023(\\w\\w)"
 
-	app(frm, to)
-
+	org.DirExists()
+	org.GetEntries()
+	org.ParseFiles()
+	org.MakeDir()
+	org.Move()
 }
