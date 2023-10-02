@@ -5,30 +5,19 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 type organizer struct {
-	/*
-		Maybe
-			Files   map[string]fs.DirEntry
-		could be better?
-	*/
-
 	Files   []fs.DirEntry
 	NewDirs []string
 
-	From string
-	To   string
-
-	// No se usan
-	Dirs      []fs.DirEntry
-	OldPath   string
-	NewPath   string
+	From      string
+	To        string
 	Recursive bool
-
-	Regex string
+	Regex     string
 }
 
 func CleanInput(input *string) {
@@ -36,13 +25,11 @@ func CleanInput(input *string) {
 		*input = strings.TrimPrefix(*input, ".")
 		current, _ := os.Getwd()
 		*input = current + *input
-	}
 
-	if strings.HasSuffix(*input, "\\") || strings.HasSuffix(*input, "/") {
+	} else if strings.HasSuffix(*input, "\\") || strings.HasSuffix(*input, "/") {
 		*input = (*input)[:len(*input)-1]
-	}
 
-	if *input == "." {
+	} else if *input == "." {
 		*input, _ = os.Getwd()
 	}
 }
@@ -68,8 +55,21 @@ func (o *organizer) GetEntries() {
 	}
 }
 
-func (o *organizer) GetAllEntries() {
-	// TODO (Recursive)
+func (o *organizer) recursive() {
+	filepath.WalkDir(o.From, func(path string, d fs.DirEntry, err error) error {
+
+		if d.IsDir() {
+			o.From = path
+			o.GetEntries()
+			o.ParseFiles()
+			o.MakeDirs()
+			o.Move()
+		}
+
+		o.Files = nil
+		o.NewDirs = nil
+		return nil
+	})
 }
 
 func (o *organizer) ParseFiles() {
@@ -80,6 +80,7 @@ func (o *organizer) ParseFiles() {
 		if len(match) >= 2 {
 			value := match[1]
 			// TODO: Check if there's repeated values in o.NewDirs
+
 			o.NewDirs = append(o.NewDirs, value)
 		}
 	}
@@ -112,7 +113,7 @@ func (o *organizer) Move() {
 
 			err := os.Rename(old, new)
 			if err != nil {
-				log.Fatal(err)
+				fmt.Println(err)
 			}
 		}
 	}
