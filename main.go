@@ -2,16 +2,33 @@ package main
 
 import (
 	"flag"
+	"log"
 )
 
 func main() {
-	frm := flag.String("frm", "", "Folder that you want to read")
-	to := flag.String("to", "", "Folder that you want to move the files to")
+	var org organizer
+	flag.StringVar(&org.From, "from", "", "Dir you want to move your files from")
+	flag.StringVar(&org.To, "to", "", "Dir you want to move your files to")
+	flag.StringVar(&org.Regex, "regex", "2023(\\w\\w)", "Regex")
+	flag.BoolVar(&org.Recursive, "recursive", false, "Regex")
 	flag.Parse()
 
-	clean_input(frm)
-	clean_input(to)
+	if org.From == "" || org.To == "" {
+		log.Fatal("The flags can't be empty strings")
+	}
 
-	app(frm, to)
+	CleanInput(&org.From)
+	CleanInput(&org.To)
+	org.DirExists()
+
+	switch org.Recursive {
+	case false:
+		org.GetEntries()
+		org.ParseFiles()
+		org.MakeDirs()
+		org.Move()
+	case true:
+		org.recursive()
+	}
 
 }
